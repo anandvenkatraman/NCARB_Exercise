@@ -1,0 +1,48 @@
+<div class="panel">
+    <div class="panel-body">
+        <div class="modal-header">
+            <h3 class="modal-title">Edit Person</h3>
+        </div>
+        <div class="alert alert-success" ng-show="isOK">
+            <strong>Success!</strong> Record updated successfully.
+        </div>
+        <div class="alert alert-danger" ng-show="isNotOK">
+            <strong>Error!</strong> Please cancel and try again.
+        </div>
+        <div class="modal-body">
+            <form name="person_form" class="form-horizontal" role="form" method="post">
+                <div class="form-group">
+                    <label for="FirstName">
+                        First Name:
+                    </label>
+                    <input type="text" class="form-control" name="FirstName" placeholder="First Name" ng-model="person.FirstName" focus />
+                </div>
+                <div class="form-group">
+                    <label for="LastName">
+                        Last Name:
+                    </label>
+                    <input type="text" class="form-control" name="LastName" placeholder="Last Name" ng-model="person.LastName" />
+                </div>
+                <div class="form-group">
+                    <label for="JobTitle">
+                        Job Title:
+                    </label>
+                    <input type="text" class="form-control" name="JobTitle" placeholder="Job Title" ng-model="person.JobTitle" />
+                </div>
+                <div class="modal-footer">
+                    <form-element label="">
+                        <div class="text-right">
+                            <a class="btn btn-sm" ng-click="cancel()">Cancel</a>
+                            <button ng-click="savePerson(person);"
+                                    class="btn btn-sm btn-primary"
+                                    type="submit">
+                                Update
+                            </button>
+                        </div>
+                    </form-element>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+

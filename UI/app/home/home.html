@@ -1,0 +1,23 @@
+<h4 class="text-center">Home</h4>
+<hr />
+<div class="table-responsive container">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            List of persons
+        </div>
+        <div class="panel-body">
+            <table class="table table-striped table-bordered">
+
+                <tr><th ng-repeat="p in columns">{{p.text}}</th></tr>
+                <tr ng-repeat="p in persons">
+                    <td>{{p.FirstName}}</td>
+                    <td>{{p.LastName}}</td>
+                    <td>{{p.JobTitle}}</td>
+                    <td style="width:50px">
+                        <button type="button" class="btn btn-default" ng-click="open(p);">Edit</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
