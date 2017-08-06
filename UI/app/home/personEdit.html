@@ -1,10 +1,10 @@
 <div class="panel">
     <div class="panel-body">
         <div class="modal-header">
-            <h3 class="modal-title">Edit Person</h3>
+            <h3 class="modal-title">{{title}}</h3>
         </div>
         <div class="alert alert-success" ng-show="isOK">
-            <strong>Success!</strong> Record updated successfully.
+            <strong>Success!</strong> Record saved successfully.
         </div>
         <div class="alert alert-danger" ng-show="isNotOK">
             <strong>Error!</strong> Please cancel and try again.
@@ -36,7 +36,7 @@
                             <button ng-click="savePerson(person);"
                                     class="btn btn-sm btn-primary"
                                     type="submit">
-                                Update
+                                {{buttonText}}
                             </button>
                         </div>
                     </form-element>

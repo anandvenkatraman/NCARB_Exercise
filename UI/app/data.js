@@ -15,6 +15,15 @@ app.factory("Data", ['$http', '$location',
                 return result;
             });
         };
-        
+        obj.put = function (q, object) {
+            return $http.put(serviceBase + q, object).then(function (result) {
+                return result;
+            });
+        };
+        obj.delete = function (q) {
+            return $http.delete(serviceBase + q).then(function (result) {
+                return result;
+            });
+        };
         return obj;
     }]);

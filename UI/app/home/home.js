@@ -8,19 +8,39 @@ angular.module('myApp.home', ['ngRoute'])
             controller: 'HomeCtrl'
         });
     }])
-
-    .controller('HomeCtrl', function ($scope, $modal, Data) {
+    .filter('startFrom', function() {
+        return function(input, start) {
+            if(input) {
+                start = +start; //parse to int
+                return input.slice(start);
+            }
+            return [];
+        }
+    })
+    .controller('HomeCtrl', function ($scope, $modal, Data, $timeout) {
         $scope.person = {};
-        $scope.columns = [
-            { text: "First Name", predicate: "FirstName" },
-            { text: "Last Name", predicate: "LastName" },
-            { text: "Job Title", predicate: "JobTitle" },
-            { text: "Action", predicate: "" }
-        ];
-
-        Data.get('Persons').then(function (data) {
-            $scope.persons = data;
-        });
+        $scope.currentPage = 1;
+        $scope.entryLimit = 5; 
+       
+        $scope.setPage = function(pageNo) {
+            $scope.currentPage = pageNo;
+        };
+        $scope.filter = function() {
+            $timeout(function() { 
+                $scope.filteredItems = $scope.filtered.length;
+            }, 10);
+        };
+        $scope.sort_by = function(predicate) {
+            $scope.predicate = predicate;
+            $scope.reverse = !$scope.reverse;
+        };
+        $scope.updateList = function(){
+            Data.get('Persons').then(function (data) {
+                $scope.persons = data;
+                $scope.filteredItems = $scope.persons.length; 
+                $scope.totalItems = $scope.persons.length;
+            });
+        }
 
         $scope.open = function (p) {
             var modalInstance = $modal.open({
@@ -32,13 +52,33 @@ angular.module('myApp.home', ['ngRoute'])
                     }
                 }
             });
-            modalInstance.result.then(function (o) {
-                p.FirstName = o.FirstName;
-                p.LastName = o.LastName;
-                p.JobTitle = o.JobTitle;
+            modalInstance.result.then(function () {
+                $scope.updateList();
             });
         };
 
+        $scope.deletePerson = function(p){
+        if(confirm("Are you OK to delete (" + p.FirstName + " " + p.LastName + " - " + p.JobTitle + ")?")){
+            Data.delete("persons/"+p.Id).then(function(result){
+                    $scope.updateList();
+                });
+            }
+        };
+        $scope.deleteAll = function(){
+        if(confirm("Are you OK to delete all persons data?")){
+            Data.put("persons/deleteAll").then(function(result){
+                    $scope.updateList();
+                });
+            }
+        };
+        $scope.generatePersons = function(){
+        if(confirm("Are you OK to generate a list of persons?")){
+            Data.put("persons/generateData").then(function(result){
+                    $scope.updateList();
+                });
+            }
+        };
+        $scope.updateList();
     });
 
 
@@ -50,7 +90,9 @@ app.controller('PersonEditCtrl', function ($scope, $modalInstance, item, Data, $
     $scope.cancel = function () {
         $modalInstance.dismiss('Close');
     };
-
+    $scope.title = (item.Id > 0) ? 'Update Person' : 'Add Person';
+    $scope.buttonText = (item.Id > 0) ? 'Update' : 'Add';
+    
     var original = item;
     $scope.isClean = function () {
         return angular.equals(original, $scope.person);
@@ -61,17 +103,13 @@ app.controller('PersonEditCtrl', function ($scope, $modalInstance, item, Data, $
             console.log(result);
             if (result.status == '200') {
                 $scope.isOK = true;
-                var x = angular.copy(person);
-                $timeout(function () {
-                    $modalInstance.close(x);
-                }, 1500);
-                
-            } else {
+            } 
+            else {
                 $scope.isNotOK = true;
-                $timeout(function () {
+            }
+            $timeout(function () {
                     $modalInstance.close();
                 }, 1500);
-            }
         });
     };
 });

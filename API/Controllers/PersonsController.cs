@@ -5,29 +5,25 @@ using System.Web.Http;
 using TestApi1.Models;
 using System.Web.Script.Serialization;
 using System.Diagnostics;
+using TestApi1.Caching;
+
 namespace TestApi1.Controllers
 {
     public class PersonsController : ApiController
     {
 
-        static Person[] persons = new Person[]
-        {
-            new Person { Id = 1, FirstName = "John", LastName = "Smith", JobTitle = "COO"},
-            new Person { Id = 2, FirstName = "Jane", LastName = "Doe", JobTitle = "CFO"},
-        };
-
         // GET api/persons
         [HttpGet]
         public IEnumerable<Person> Get()
         {
-            return persons;
+            return WebApiCache.Persons.OrderByDescending(p => p.Id);
         }
 
         // GET api/persons/1
         [HttpGet]
         public IHttpActionResult Get(int id)
         {
-            var person = persons.FirstOrDefault((p) => p.Id == id);
+            var person = WebApiCache.Persons.FirstOrDefault(p => (p.Id == id));
             return Ok(person);
             
         }
@@ -36,11 +32,39 @@ namespace TestApi1.Controllers
         [HttpPost]
         public IHttpActionResult Post([FromBody] Person v)
         {
-            var person = persons.FirstOrDefault((p) => p.Id == v.Id);
-            printPerson(person,v);
-            person.FirstName = v.FirstName;
-            person.LastName = v.LastName;
-            person.JobTitle = v.JobTitle;
+            if (WebApiCache.Persons.Where(p => p.Id == v.Id).Count() == 0) WebApiCache.AddPerson(v);
+            else
+            {
+                var p = WebApiCache.Persons.FirstOrDefault(o => o.Id == v.Id);
+                WebApiCache.UpdatePerson(p, v);
+                printPerson(p, v);
+            }
+            return Ok();
+        }
+
+        // DELETE api/persons/id
+        [HttpDelete]
+        public IHttpActionResult Delete(int id)
+        {
+            WebApiCache.RemovePerson(id);
+            return Ok();
+        }
+
+        // PUT api/persons/deleteall
+        [Route("api/persons/DeleteAll")]
+        [HttpPut]
+        public IHttpActionResult DeleteAll()
+        {
+            WebApiCache.ClearPersons();
+            return Ok();
+        }
+
+        // PUT api/persons/generatedata
+        [Route("api/persons/GenerateData")]
+        [HttpPut]
+        public IHttpActionResult GenerateData()
+        {
+            WebApiCache.GeneratePersonsData();
             return Ok();
         }
 

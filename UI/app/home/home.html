@@ -1,23 +1,58 @@
 <h4 class="text-center">Home</h4>
 <hr />
-<div class="table-responsive container">
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">PageSize:
+                <select ng-model="entryLimit" class="form-control">
+                <option ng-selected="true">5</option>
+                <option>10</option>
+                <option>20</option>
+                <option>50</option>
+                <option>100</option>
+            </select>
+            
+        </div>
+        <div class="col-md-3">Filter:
+            <input type="text" ng-model="search" ng-change="filter()" placeholder="Filter" class="form-control" />
+        </div>
+        <div class="col-md-6 text-right">
+            <button type="button" class="btn btn-success" ng-click="open(person);">&nbsp;Add New</button>
+            <button ng-show="persons.length > 0" type="button" class="btn btn-danger" ng-click="deleteAll();">&nbsp;Delete All</button>
+            <button ng-show="persons.length == 0" type="button" class="btn btn-warning" ng-click="generatePersons();">&nbsp;Generate Data</button>
+        </div>
+    </div>
+    <br/>
     <div class="panel panel-primary">
         <div class="panel-heading">
-            List of persons
+            <h5>Displaying {{ filtered.length }} of {{ totalItems}} total persons</h5>
         </div>
         <div class="panel-body">
             <table class="table table-striped table-bordered">
-
-                <tr><th ng-repeat="p in columns">{{p.text}}</th></tr>
-                <tr ng-repeat="p in persons">
+                <tr ng-show="filteredItems == 0">
+                    <td style="vertical-align:middle;" colspan="4">No data found</td>
+                </tr>
+                <tr ng-show="filteredItems > 0">
+                    <th>First Name&nbsp;<a ng-click="sort_by('FirstName');"><i class="glyphicon glyphicon-sort"></i></a></th>
+                    <th>Last Name&nbsp;<a ng-click="sort_by('LastName');"><i class="glyphicon glyphicon-sort"></i></a></th>
+                    <th>Job Title&nbsp;<a ng-click="sort_by('JobTitle');"><i class="glyphicon glyphicon-sort"></i></a></th>
+                    <th>Action</th>
+                </tr>
+                <tr ng-repeat="p in filtered = (persons | filter:search | orderBy : predicate :reverse) | startFrom:(currentPage-1)*entryLimit | limitTo:entryLimit">
                     <td>{{p.FirstName}}</td>
                     <td>{{p.LastName}}</td>
                     <td>{{p.JobTitle}}</td>
-                    <td style="width:50px">
-                        <button type="button" class="btn btn-default" ng-click="open(p);">Edit</button>
+                    <td style="width:150px">
+                        <button type="button" class="btn btn-warning" ng-click="open(p);">Edit</button>
+                        <button type="button" class="btn btn-danger" ng-click="deletePerson(p);">Delete</button>
                     </td>
                 </tr>
             </table>
+
         </div>
+
+    </div>
+    <div class="col-md-12" ng-show="filteredItems > 0">
+        <div pagination="" page="currentPage" on-select-page="setPage(page)" boundary-links="true" total-items="filteredItems" items-per-page="entryLimit"
+            class="pagination-small" previous-text="&laquo;" next-text="&raquo;"></div>
     </div>
 </div>
